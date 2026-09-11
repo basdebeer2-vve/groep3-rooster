@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Groep 3 — weekrooster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Karla:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --papier:#EDE9E1;
+  --vlak:#FFFFFF;
+  --inkt:#141414;
+  --inkt-dim:rgba(20,20,20,.78);
+  --groen:#0D1B12;
+  --oker:#8A5A00;
+  --oker-vlak:#F3D48A;
+  --rose:#932A1F;
+  --lijn:rgba(20,20,20,.3);
+  --lijn-sterk:rgba(20,20,20,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--papier);
+  color:var(--inkt);
+  font-family:'Karla',system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  min-height:100vh;
+  padding:clamp(16px,4vw,40px) clamp(12px,4vw,40px) 80px;
+}
+.wrap{max-width:1140px;margin:0 auto}
+
+/* ---- kop ---- */
+header{border-bottom:2px solid var(--inkt);padding-bottom:18px;margin-bottom:22px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--inkt-dim);margin:0 0 6px}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(34px,7vw,58px);
+  line-height:.98;margin:0 0 4px;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--groen)}
+.regels{margin:10px 0 0;color:var(--inkt-dim);font-size:14.5px;max-width:56ch}
+.kop b,.weeknr,h1{color:var(--inkt)}
+.regels b{color:var(--inkt)}
+
+/* ---- weekbalk ---- */
+.weekbalk{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:22px 0 14px}
+.weeknr{font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.08em;
+  text-transform:uppercase}
+button{font-family:inherit;font-size:14px;cursor:pointer}
+.nav{background:var(--vlak);border:1px solid var(--lijn);color:var(--inkt);
+  border-radius:999px;width:34px;height:34px;line-height:1;transition:.15s}
+.nav:hover{border-color:var(--groen);color:var(--groen)}
+.spacer{flex:1}
+.beheer{background:none;border:1px solid var(--lijn);color:var(--inkt-dim);
+  padding:7px 14px;border-radius:999px;transition:.15s}
+.beheer:hover{color:var(--groen);border-color:var(--groen)}
+.beheer.aan{border-color:var(--groen);color:#fff;background:var(--groen);font-weight:700}
+
+/* ---- rooster ---- */
+.rooster{display:grid;grid-template-columns:56px repeat(7,1fr);gap:6px}
+.kop{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--inkt-dim);padding:0 0 4px 2px}
+.kop b{display:block;font-family:'Karla',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:0;color:var(--inkt);text-transform:none}
+.kop.vandaag b{color:#fff;background:var(--groen);display:inline-block;padding:1px 7px;border-radius:2px}
+.kop.dicht{opacity:.6}
+.kop.dicht b{text-decoration:line-through}
+.dagknop{display:block;margin-top:4px;background:none;border:1px solid var(--lijn-sterk);
+  color:var(--inkt-dim);border-radius:999px;padding:2px 9px;font-size:10.5px;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;transition:.15s}
+.dagknop:hover{border-color:var(--inkt);color:var(--inkt)}
+.dagknop.open{background:var(--inkt);color:#fff;border-color:var(--inkt)}
+.rijlabel{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;
+  color:var(--inkt-dim);display:flex;align-items:center;
+  justify-content:flex-end;padding-right:8px;text-align:right}
+
+.vak{background:var(--vlak);border:1.5px solid var(--lijn);border-radius:3px;
+  min-height:86px;padding:6px;display:flex;flex-direction:column;gap:5px;transition:.15s}
+.vak.vol{background:rgba(18,36,26,.09);border-style:dashed;border-color:var(--lijn-sterk)}
+.vak.verleden{opacity:.45}
+.plus{margin-top:auto;background:#F4F1E8;border:1.5px dashed var(--lijn-sterk);color:var(--inkt);font-weight:500;
+  border-radius:3px;padding:5px 2px;font-size:12px;transition:.15s;width:100%}
+.plus:hover{border-color:var(--groen);color:var(--groen);background:rgba(47,107,79,.06)}
+.vol-tekst{margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--inkt);font-weight:500;text-align:center;padding:6px 0}
+
+/* ---- naamkaartje ---- */
+.kaart{background:#fff;color:var(--inkt);border:1.5px solid var(--lijn-sterk);
+  border-left:4px solid var(--groen);border-radius:2px;
+  padding:6px 8px;position:relative;animation:leg .22s ease-out}
+@keyframes leg{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.kaart .stip{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
+.kaart .stip.wacht{background:#D2700A}
+.kaart .stip.akkoord{background:#141414}
+.kaart .naam{padding-right:12px;font-weight:700;font-size:13px;line-height:1.25;word-break:break-word}
+.kaart .type{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--inkt-dim);margin-top:1px;font-weight:500}
+.kaart.solo{background:var(--oker-vlak);border-color:rgba(184,135,27,.35);border-left-color:var(--oker)}
+.kaart.solo .type{color:#5A3F03}
+.kaart.aangevraagd{background:none;border:1px dashed var(--lijn-sterk);border-left:3px dashed var(--lijn-sterk)}
+.kaart.aangevraagd .naam{font-weight:500}
+.kaartknoppen{display:flex;gap:5px;margin-top:6px}
+.kaartknoppen button{flex:1;border:1px solid var(--groen);border-radius:2px;padding:4px 0;
+  font-size:11.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em}
+.ja{background:var(--groen);color:#fff}
+.nee{background:none;border-color:var(--lijn-sterk)!important;color:var(--inkt-dim)}
+.nee:hover{border-color:var(--rose)!important;color:var(--rose)}
+.wis{position:absolute;top:16px;right:3px;background:none;border:none;color:var(--inkt-dim);
+  opacity:.5;font-size:15px;line-height:1;padding:2px}
+.wis:hover{opacity:1;color:var(--rose)}
+
+/* ---- afgewezen strook ---- */
+.afgewezen{margin-top:34px;border-top:2px solid var(--lijn-sterk);padding-top:14px}
+.afgewezen h2{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--inkt-dim);font-weight:400;margin:0 0 8px}
+.afg-item{font-size:13.5px;color:var(--rose);margin-bottom:3px}
+.afg-item span{color:var(--inkt-dim)}
+
+/* ---- dialoog ---- */
+dialog{border:1px solid var(--lijn);border-radius:4px;background:var(--vlak);color:var(--inkt);
+  padding:22px;max-width:340px;width:calc(100% - 32px);font-family:'Karla',sans-serif;
+  box-shadow:0 12px 40px rgba(30,50,38,.18)}
+dialog::backdrop{background:rgba(30,50,38,.35)}
+dialog h3{font-family:'Fraunces',serif;font-size:22px;margin:0 0 2px;font-weight:600}
+dialog .wanneer{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--inkt-dim);margin-bottom:16px}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;margin-bottom:5px;color:var(--inkt-dim)}
+input[type=text],input[type=password]{width:100%;padding:9px 10px;border:1px solid var(--lijn-sterk);
+  border-radius:2px;background:#fff;font-family:inherit;font-size:15px;color:inherit}
+input:focus-visible,button:focus-visible{outline:2px solid var(--groen);outline-offset:2px}
+.keuze{display:flex;gap:8px;margin:14px 0 18px}
+.keuze button{flex:1;padding:10px 6px;border:1px solid var(--lijn-sterk);background:#fff;
+  border-radius:2px;color:inherit;text-align:left;transition:.12s}
+.keuze button b{display:block;font-size:14px}
+.keuze button small{font-size:11.5px;color:var(--inkt-dim)}
+.keuze button[aria-pressed=true]{background:var(--groen);color:#fff;border-color:var(--groen)}
+.keuze button[aria-pressed=true] small{color:rgba(255,255,255,.8)}
+.keuze button:disabled{opacity:.4;cursor:not-allowed}
+.acties{display:flex;gap:8px;justify-content:flex-end}
+.acties button{padding:9px 16px;border-radius:2px;border:1px solid var(--lijn-sterk);
+  background:#fff;color:inherit;font-weight:700}
+.acties .primair{background:var(--groen);color:#fff;border-color:var(--groen)}
+.foutje{color:var(--rose);font-size:13px;margin:0 0 10px;min-height:1px}
+.wa{display:block;text-align:center;background:#141414;color:#fff;text-decoration:none;
+  padding:13px;border-radius:3px;font-weight:700;font-size:15px;transition:.15s}
+.wa:hover{background:#000}
+
+.voet{margin-top:40px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:var(--inkt-dim);letter-spacing:.04em;line-height:1.7}
+
+@media (max-width:1000px){
+  body{padding:14px 12px 60px}
+  .rooster{grid-template-columns:58px 1fr;gap:7px}
+  .kop{grid-column:1 / -1;padding:20px 0 2px;border-top:2px solid var(--lijn-sterk);
+    margin-top:12px;font-size:12px}
+  .kop:first-of-type{border-top:none;margin-top:0;padding-top:2px}
+  .kop b{display:inline;font-size:19px;margin-right:8px}
+  .kop.vandaag b{padding:2px 8px}
+  .dagknop{display:inline-block;margin:0 0 0 6px;font-size:12px;padding:3px 12px;vertical-align:2px}
+  .rijlabel{justify-content:flex-end;padding-right:4px;font-size:14px;font-weight:500;
+    align-items:flex-start;padding-top:12px}
+  .vak{min-height:0;padding:8px}
+  .plus{font-size:15px;padding:10px 4px}
+  .vol-tekst{font-size:12px;padding:10px 0}
+  .kaart{padding:9px 11px;border-left-width:5px}
+  .kaart .naam{font-size:16px;padding-right:16px}
+  .kaart .type{font-size:11px}
+  .kaart .stip{width:11px;height:11px;top:8px;right:8px}
+  .kaartknoppen button{font-size:13px;padding:8px 0}
+  .wis{font-size:19px;top:22px;right:5px}
+  h1{font-size:clamp(30px,9vw,42px)}
+  .regels{font-size:15px}
+  .weeknr{font-size:14px}
+  .afg-item{font-size:15px}
+  .voet{font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">Werkplek · lokaal Groep 3</p>
+  <h1>Wie zit er <em>naast je</em>?</h1>
+  <p class="regels">Blokken van twee uur, twee plekken per blok. Kies <b>co-work</b> als je gezelschap leuk vindt, of <b>solo</b> als je het lokaal voor jezelf nodig hebt — dan gaat het blok dicht. Jan Willem keurt aanvragen goed. Aanvragen kan tot <b>2 uur</b> voor aanvang van het blok.</p>
+</header>
+
+<div class="weekbalk">
+  <button class="nav" id="vorige" aria-label="Vorige week">‹</button>
+  <span class="weeknr" id="weeknr">—</span>
+  <button class="nav" id="volgende" aria-label="Volgende week">›</button>
+  <button class="nav" id="verversknop" aria-label="Ververs" style="width:auto;padding:0 14px;font-size:12px">Ververs</button>
+  <button class="nav" id="nu" aria-label="Deze week" style="width:auto;padding:0 14px;font-size:12px">Vandaag</button>
+  <span class="spacer"></span>
+  <button class="beheer" id="beheerknop">Beheer</button>
+</div>
+
+<div class="rooster" id="rooster"></div>
+
+<section class="afgewezen" id="afgewezen" hidden>
+  <h2>Niet doorgegaan deze week</h2>
+  <div id="afgewezenlijst"></div>
+</section>
+
+<p class="voet">
+  Iedereen met deze link — inclusief het deel achter # — ziet hetzelfde rooster.<br>
+  Beheercode: 1234 — aan te passen bovenin de code.<br>
+  Bovenin de code staat het WhatsApp-nummer van Jan Willem.
+</p>
+</div>
+
+<dialog id="dlg">
+  <h3 id="dlgtitel">Plek aanvragen</h3>
+  <p class="wanneer" id="dlgwanneer"></p>
+  <p class="foutje" id="dlgfout"></p>
+  <label for="naam">Je naam</label>
+  <input type="text" id="naam" autocomplete="name" maxlength="28" placeholder="Bijv. Marieke">
+  <label for="tel" style="margin-top:12px">Je 06-nummer <span style="font-weight:400;text-transform:none;opacity:.6">— optioneel, voor de uitslag</span></label>
+  <input type="text" id="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="06 12 34 56 78">
+  <div class="keuze">
+    <button type="button" id="kiescw" aria-pressed="true"><b>Co-work</b><small>Deel het lokaal</small></button>
+    <button type="button" id="kiessolo" aria-pressed="false"><b>Solo</b><small>Lokaal dicht</small></button>
+  </div>
+  <div class="acties">
+    <button type="button" id="annuleer">Annuleren</button>
+    <button type="button" class="primair" id="verstuur">Aanvragen</button>
+  </div>
+</dialog>
+
+<dialog id="uitdlg">
+  <h3>Uitslag doorgeven</h3>
+  <p class="wanneer">Bericht voor <span id="uit-naam"></span> staat klaar</p>
+  <a class="wa" id="uit-link" target="_blank" rel="noopener">Openen in WhatsApp</a>
+  <div class="acties" style="margin-top:16px">
+    <button type="button" id="uit-klaar">Sluiten</button>
+  </div>
+</dialog>
+
+<dialog id="wadlg">
+  <h3>Aanvraag staat erin</h3>
+  <p class="wanneer">Nog één tik: laat het Jan Willem weten</p>
+  <a class="wa" id="wa-link" target="_blank" rel="noopener">Appje sturen naar Jan Willem</a>
+  <div class="acties" style="margin-top:16px">
+    <button type="button" id="wa-klaar">Sluiten</button>
+  </div>
+</dialog>
+
+<dialog id="pindlg">
+  <h3>Beheer openen</h3>
+  <p class="wanneer">Alleen voor Jan Willem</p>
+  <p class="foutje" id="pinfout"></p>
+  <label for="pin">Code</label>
+  <input type="password" id="pin" inputmode="numeric" autocomplete="off">
+  <div class="acties" style="margin-top:18px">
+    <button type="button" id="pinannuleer">Annuleren</button>
+    <button type="button" class="primair" id="pinok">Openen</button>
+  </div>
+</dialog>
+
+<script>
+const CODE = "1234";
+const TELEFOON = "31654377563"; // WhatsApp-nummer Jan Willem
+const SLEUTEL = "groep3-boekingen-v1";
+const DAGEN = ["Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag","Zondag"];
+const BLOKKEN = [
+  {id:"09", label:"09–11", start:9},
+  {id:"11", label:"11–13", start:11},
+  {id:"13", label:"13–15", start:13},
+  {id:"15", label:"15–17", start:15}
+];
+const UREN_VOORAF = 2;
+function blokLabel(id){const b=BLOKKEN.find(x=>x.id===id);return b?b.label:id}
+
+let boekingen = [];
+let maandag = weekStart(new Date());
+let beheer = false;
+let keuze = {datum:null, dagdeel:null, type:"cw"};
+
+/* ---------- datum ---------- */
+function weekStart(d){const x=new Date(d);const dag=(x.getDay()+6)%7;x.setHours(0,0,0,0);x.setDate(x.getDate()-dag);return x}
+function weeknummer(d){const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const dag=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()+4-dag);
+  const jan1=new Date(Date.UTC(x.getUTCFullYear(),0,1));
+  return Math.ceil(((x-jan1)/86400000+1)/7)}
+function plusDagen(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function kort(d){return d.getDate()+" "+["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"][d.getMonth()]}
+
+/* ---------- opslag ---------- */
+// ---------- opslag via Zoho Creator ----------
+// Alle aanroepen gaan als POST naar /api/rooster op deze site zelf.
+// Het bestand _redirects stuurt ze door naar je Creator-functie,
+// waardoor de browser geen verkeer naar een ander domein ziet.
+
+// Creator verpakt zijn antwoord soms in een omhulsel — hier pellen we dat af.
+function pelUit(tekst){
+  let d;
+  try{ d=JSON.parse(tekst); }catch(e){ return []; }
+  for(const sleutel of ["result","output","response","data"]){
+    if(d && !Array.isArray(d) && typeof d==="object" && sleutel in d) d=d[sleutel];
+  }
+  if(typeof d==="string"){
+    try{ d=JSON.parse(d); }catch(e){ return []; }
+  }
+  return Array.isArray(d)?d:[];
+}
+
+async function roep(gegevens){
+  return fetch("/api/rooster",{
+    method:"POST",
+    cache:"no-store",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(gegevens)
+  });
+}
+
+async function laden(){
+  try{
+    const r=await roep({actie:"lees",inhoud:""});
+    const t=r.ok?await r.text():"[]";
+    if(t.includes('"code":4000')) meldLimiet();
+    boekingen = pelUit(t);
+    laatsteOphaal=Date.now();
+  }catch(e){boekingen=[]}
+  teken();
+}
+
+async function bewaren(){
+  try{
+    const r=await roep({actie:"schrijf",inhoud:JSON.stringify(boekingen)});
+    const t=await r.text();
+    if(t.includes('"code":4000')){ meldLimiet(); return; }
+    if(!r.ok) throw new Error("mislukt");
+  }catch(e){alert("Opslaan lukte niet. Probeer het nog een keer.")}
+}
+
+// Bewust geen automatische verversing: gratis Creator staat 100 aanroepen
+// per dag toe. Verversen gebeurt bij openen en via de knop.
+let laatsteOphaal=0;
+
+async function ververs(stil){
+  try{
+    const r=await roep({actie:"lees",inhoud:""});
+    const t=await r.text();
+    if(t.includes('"code":4000')){ if(!stil) meldLimiet(); return; }
+    boekingen=pelUit(t);
+    laatsteOphaal=Date.now();
+    teken();
+  }catch(e){}
+}
+
+function meldLimiet(){
+  alert("De daglimiet van Zoho is bereikt (100 aanroepen). Morgen na middernacht werkt het weer.");
+}
+
+// Bij terugkeren naar het tabblad, maar hooguit eens per tien minuten.
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="visible" && Date.now()-laatsteOphaal>600000) ververs(true);
+});
+
+/* ---------- regels ---------- */
+function inVak(datum,dagdeel,status){
+  return boekingen.filter(b=>b.datum===datum&&b.dagdeel===dagdeel&&(!status||b.status===status));
+}
+function dagDicht(datum){return boekingen.some(b=>b.type==="dicht"&&b.datum===datum)}
+function bezetting(datum,dagdeel){
+  if(dagDicht(datum)) return {vol:true,reden:"dicht",ok:[]};
+  const ok=inVak(datum,dagdeel,"goedgekeurd");
+  if(ok.some(b=>b.type==="solo")) return {vol:true,reden:"solo",ok};
+  return {vol:ok.length>=2,reden:"twee",ok};
+}
+function deadline(datum,dd){
+  const d=new Date(datum+"T00:00");
+  d.setHours(dd.start-UREN_VOORAF,0,0,0);
+  return d;
+}
+function teLaat(datum,dd){return new Date()>deadline(datum,dd)}
+function deadlineTekst(dd){return "Sluit om "+String(dd.start-UREN_VOORAF).padStart(2,"0")+":00"}
+
+function magGoedkeuren(b){
+  if(dagDicht(b.datum)) return false;
+  const {ok}=bezetting(b.datum,b.dagdeel);
+  if(b.type==="solo") return ok.length===0;
+  return !ok.some(x=>x.type==="solo") && ok.length<2;
+}
+
+/* ---------- tekenen ---------- */
+function teken(){
+  const r=document.getElementById("rooster");
+  r.innerHTML="";
+  const vandaag=iso(new Date());
+  document.getElementById("weeknr").textContent=
+    "Week "+weeknummer(maandag)+" · "+kort(maandag)+" – "+kort(plusDagen(maandag,6));
+
+  const breed=window.matchMedia("(max-width:760px)").matches;
+  if(!breed) r.appendChild(el("div","kop",""));
+  DAGEN.forEach((naam,i)=>{
+    const d=plusDagen(maandag,i);
+    const k=el("div","kop"+(iso(d)===vandaag?" vandaag":"")+(dagDicht(iso(d))?" dicht":""));
+    k.innerHTML="<b>"+naam+"</b>"+kort(d);
+    if(beheer) k.appendChild(dagKnop(d));
+    r.appendChild(k);
+    if(breed) BLOKKEN.forEach(b=>{r.appendChild(rijlabel(b));r.appendChild(vak(d,b,vandaag))});
+  });
+  if(!breed) BLOKKEN.forEach(b=>{
+    r.appendChild(rijlabel(b));
+    DAGEN.forEach((_,i)=>r.appendChild(vak(plusDagen(maandag,i),b,vandaag)));
+  });
+  tekenAfgewezen();
+}
+function telNaarWa(t){
+  const c=(t||"").replace(/[^0-9+]/g,"");
+  if(!c) return "";
+  if(c.startsWith("+31")) return c.slice(1);
+  if(c.startsWith("0031")) return c.slice(2);
+  if(c.startsWith("31")&&c.length>=11) return c;
+  if(c.startsWith("0")) return "31"+c.slice(1);
+  return c;
+}
+function appLink(nummer,tekst){return "https://wa.me/"+nummer+"?text="+encodeURIComponent(tekst)}
+
+function dagKnop(d){
+  const datum=iso(d), dicht=dagDicht(datum);
+  const knop=el("button","dagknop"+(dicht?" open":""),dicht?"Openen":"Dag dicht");
+  knop.onclick=async()=>{
+    if(dicht){
+      boekingen=boekingen.filter(b=>!(b.type==="dicht"&&b.datum===datum));
+    }else{
+      const bezet=boekingen.filter(b=>b.datum===datum&&b.status!=="afgewezen"&&b.type!=="dicht");
+      if(bezet.length && !confirm("Er staan al "+bezet.length+" aanvragen op deze dag. Toch dichtzetten?")) return;
+      boekingen.push({id:Date.now()+"-dicht",type:"dicht",datum,dagdeel:"alle",status:"goedgekeurd",naam:"Gesloten"});
+    }
+    await bewaren();teken();
+  };
+  return knop;
+}
+
+function el(t,c,tekst){const e=document.createElement(t);if(c)e.className=c;if(tekst)e.textContent=tekst;return e}
+function rijlabel(dd){const e=el("div","rijlabel");e.textContent=dd.label;return e}
+
+function vak(d,dd,vandaag){
+  const datum=iso(d);
+  const {vol,reden,ok}=bezetting(datum,dd.id);
+  const v=el("div","vak"+(vol?" vol":"")+(datum<vandaag?" verleden":""));
+  ok.forEach(b=>v.appendChild(kaartje(b)));
+  inVak(datum,dd.id,"aangevraagd").forEach(b=>v.appendChild(kaartje(b)));
+
+  if(vol){
+    v.appendChild(el("div","vol-tekst",
+      reden==="dicht"?"Gesloten":reden==="solo"?"Solo — bezet":"Vol"));
+  }else if(teLaat(datum,dd)){
+    v.appendChild(el("div","vol-tekst","Aanvraag gesloten"));
+  }else{
+    const knop=el("button","plus","+ Plek aanvragen");
+    knop.onclick=()=>openDialoog(datum,dd,d);
+    v.appendChild(knop);
+  }
+  return v;
+}
+
+function kaartje(b){
+  const k=el("div","kaart "+(b.type==="solo"?"solo ":"")+(b.status==="aangevraagd"?"aangevraagd":""));
+  const stip=el("div","stip "+(b.status==="goedgekeurd"?"akkoord":"wacht"));
+  stip.title=b.status==="goedgekeurd"?"Goedgekeurd":"Wacht op goedkeuring";
+  k.appendChild(stip);
+  k.appendChild(el("div","naam",b.naam));
+  k.appendChild(el("div","type",(b.type==="solo"?"Solo":"Co-work")+(b.status==="aangevraagd"?" · aangevraagd":"")));
+  if(beheer&&b.status==="aangevraagd"){
+    const rij=el("div","kaartknoppen");
+    const ja=el("button","ja","Goedkeuren");
+    ja.onclick=async()=>{
+      if(!magGoedkeuren(b)){alert("Kan niet: dit blok is inmiddels vol of solo geboekt.");return}
+      b.status="goedgekeurd";
+      meldUitslag(b,true);
+      await bewaren();teken();
+    };
+    const nee=el("button","nee","Afwijzen");
+    nee.onclick=async()=>{
+      b.status="afgewezen";
+      meldUitslag(b,false);
+      await bewaren();teken();
+    };
+    rij.append(ja,nee);k.appendChild(rij);
+  }
+  if(beheer&&b.status==="goedgekeurd"){
+    const w=el("button","wis","×");
+    w.title="Verwijderen";w.setAttribute("aria-label","Verwijderen");
+    w.onclick=async()=>{boekingen=boekingen.filter(x=>x.id!==b.id);await bewaren();teken()};
+    k.appendChild(w);
+  }
+  return k;
+}
+
+function meldUitslag(b,akkoord){
+  if(!b.tel) return;
+  const d=new Date(b.datum+"T00:00");
+  const wanneer=DAGEN[(d.getDay()+6)%7].toLowerCase()+" "+kort(d)+" "+blokLabel(b.dagdeel);
+  const tekst=akkoord
+    ? "Hoi "+b.naam+"! Je plek in Groep 3 is goedgekeurd: "+wanneer+" ("+(b.type==="solo"?"solo":"co-work")+"). Tot dan! "+location.origin+location.pathname
+    : "Hoi "+b.naam+", helaas lukt "+wanneer+" niet in Groep 3. Een ander blok kan wel: "+location.origin+location.pathname;
+  const url=appLink(b.tel,tekst);
+  const venster=window.open(url,"_blank");
+  if(!venster){
+    // Venster geblokkeerd: toon de knop, zodat het bericht niet stilletjes verdwijnt.
+    document.getElementById("uit-naam").textContent=b.naam;
+    document.getElementById("uit-link").href=url;
+    document.getElementById("uitdlg").showModal();
+  }
+}
+
+function tekenAfgewezen(){
+  const van=iso(maandag), tot=iso(plusDagen(maandag,6));
+  const lijst=boekingen.filter(b=>b.status==="afgewezen"&&b.datum>=van&&b.datum<=tot);
+  const sec=document.getElementById("afgewezen"), box=document.getElementById("afgewezenlijst");
+  sec.hidden=lijst.length===0;box.innerHTML="";
+  lijst.forEach(b=>{
+    const d=new Date(b.datum+"T00:00");
+    const e=el("div","afg-item");
+    e.innerHTML=b.naam+" <span>— "+DAGEN[(d.getDay()+6)%7].toLowerCase()+" "+
+      blokLabel(b.dagdeel)+", "+(b.type==="solo"?"solo":"co-work")+"</span>";
+    box.appendChild(e);
+  });
+}
+
+/* ---------- dialoog ---------- */
+const dlg=document.getElementById("dlg");
+function openDialoog(datum,dd,d){
+  keuze={datum,dagdeel:dd.id,type:"cw"};
+  keuze.dd=dd;
+  document.getElementById("dlgwanneer").textContent=
+    DAGEN[(d.getDay()+6)%7]+" "+kort(d)+" · "+dd.label+" · "+deadlineTekst(dd);
+  document.getElementById("naam").value=localStorage_naam();
+  try{document.getElementById("tel").value=sessionStorage.getItem("g3tel")||""}catch(e){}
+  document.getElementById("dlgfout").textContent="";
+  const alBezet=bezetting(datum,dd.id).ok.length>0;
+  const solo=document.getElementById("kiessolo");
+  solo.disabled=alBezet;
+  solo.title=alBezet?"Er zit al iemand — solo kan niet meer":"";
+  zetType("cw");
+  dlg.showModal();
+  document.getElementById("naam").focus();
+}
+function localStorage_naam(){try{return sessionStorage.getItem("g3naam")||""}catch(e){return ""}}
+function zetType(t){
+  keuze.type=t;
+  document.getElementById("kiescw").setAttribute("aria-pressed",t==="cw");
+  document.getElementById("kiessolo").setAttribute("aria-pressed",t==="solo");
+}
+document.getElementById("kiescw").onclick=()=>zetType("cw");
+document.getElementById("kiessolo").onclick=()=>zetType("solo");
+document.getElementById("annuleer").onclick=()=>dlg.close();
+document.getElementById("verstuur").onclick=async()=>{
+  const naam=document.getElementById("naam").value.trim();
+  if(naam.length<2){document.getElementById("dlgfout").textContent="Vul je naam in.";return}
+  if(teLaat(keuze.datum,keuze.dd)){
+    document.getElementById("dlgfout").textContent="Dit blok is net gesloten — aanvragen kan tot 2 uur van tevoren.";
+    return;
+  }
+  try{sessionStorage.setItem("g3naam",naam)}catch(e){}
+  const tel=telNaarWa(document.getElementById("tel").value);
+  try{sessionStorage.setItem("g3tel",document.getElementById("tel").value)}catch(e){}
+  boekingen.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,7),
+    naam,tel,datum:keuze.datum,dagdeel:keuze.dagdeel,type:keuze.type,status:"aangevraagd"});
+  await bewaren();teken();
+  toonWhatsapp(naam);
+};
+
+
+function toonWhatsapp(naam){
+  const d=new Date(keuze.datum+"T00:00");
+  const dd=keuze.dd;
+  const tekst="Hoi Jan Willem! "+naam+" vraagt een plek aan in Groep 3: "+
+    DAGEN[(d.getDay()+6)%7].toLowerCase()+" "+kort(d)+" "+dd.label+", "+
+    (keuze.type==="solo"?"solo":"co-work")+". Goedkeuren kan hier: "+location.origin+location.pathname;
+  document.getElementById("wa-link").href="https://wa.me/"+TELEFOON+"?text="+encodeURIComponent(tekst);
+  dlg.close();
+  document.getElementById("wadlg").showModal();
+}
+document.getElementById("wa-klaar").onclick=()=>document.getElementById("wadlg").close();
+document.getElementById("uit-klaar").onclick=()=>document.getElementById("uitdlg").close();
+
+/* ---------- beheer ---------- */
+const pindlg=document.getElementById("pindlg");
+document.getElementById("beheerknop").onclick=()=>{
+  if(beheer){beheer=false;stelBeheerKnop();teken();return}
+  document.getElementById("pin").value="";
+  document.getElementById("pinfout").textContent="";
+  pindlg.showModal();document.getElementById("pin").focus();
+};
+document.getElementById("pinannuleer").onclick=()=>pindlg.close();
+document.getElementById("pinok").onclick=()=>{
+  if(document.getElementById("pin").value===CODE){beheer=true;pindlg.close();stelBeheerKnop();teken()}
+  else document.getElementById("pinfout").textContent="Code klopt niet.";
+};
+document.getElementById("pin").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("pinok").click()});
+function stelBeheerKnop(){
+  const k=document.getElementById("beheerknop");
+  k.classList.toggle("aan",beheer);
+  k.textContent=beheer?"Beheer aan":"Beheer";
+}
+
+/* ---------- navigatie ---------- */
+document.getElementById("vorige").onclick=()=>{maandag=plusDagen(maandag,-7);teken()};
+document.getElementById("volgende").onclick=()=>{maandag=plusDagen(maandag,7);teken()};
+document.getElementById("verversknop").onclick=()=>ververs(false);
+document.getElementById("nu").onclick=()=>{maandag=weekStart(new Date());teken()};
+window.addEventListener("resize",()=>teken());
+setInterval(teken,60000);
+
+laden();
+</script>
+</body>
+</html>
